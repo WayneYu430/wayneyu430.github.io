@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"8.0.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="Fractional binary numbers浮点数不能完整的表达大多数的数字，只能使用浮动逼近的方法靠近">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Introduction to Computer Systems 3">
+<meta property="og:url" content="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/index.html">
+<meta property="og:site_name" content="WayneYu">
+<meta property="og:description" content="Fractional binary numbers浮点数不能完整的表达大多数的数字，只能使用浮动逼近的方法靠近">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012094548407-1602483689083.png">
+<meta property="og:image" content="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012095136899-1602483689084.png">
+<meta property="og:image" content="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012095453347-1602483689084.png">
+<meta property="og:image" content="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012105329084-1602483689084.png">
+<meta property="og:image" content="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012115936406-1602483689084.png">
+<meta property="og:image" content="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012120642217-1602483689084.png">
+<meta property="og:image" content="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012120900089-1602483689084.png">
+<meta property="og:image" content="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012121656648-1602483689084.png">
+<meta property="article:published_time" content="2020-10-12T06:20:12.000Z">
+<meta property="article:modified_time" content="2021-01-08T08:29:52.147Z">
+<meta property="article:author" content="Wayne Yu">
+<meta property="article:tag" content="Computer System">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012094548407-1602483689083.png">
+
+
+<link rel="canonical" href="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Introduction to Computer Systems 3 | WayneYu</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">WayneYu</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section">首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags" rel="section">标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories" rel="section">分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives" rel="section">归档</a>
+
+  </li>
+        <li class="menu-item menu-item-schedule">
+
+    <a href="/schedule" rel="section">日程表</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Fractional-binary-numbers"><span class="nav-number">1.</span> <span class="nav-text">Fractional binary numbers</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IEEE-Floating-Point"><span class="nav-number">1.1.</span> <span class="nav-text">IEEE Floating Point</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rounding"><span class="nav-number">1.2.</span> <span class="nav-text">Rounding</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FP-Arithmetic"><span class="nav-number">1.3.</span> <span class="nav-text">FP Arithmetic</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FP-Multiplication"><span class="nav-number">1.3.1.</span> <span class="nav-text">FP Multiplication</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FP-Addition"><span class="nav-number">1.3.2.</span> <span class="nav-text">FP Addition</span></a></li></ol></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wayne Yu"
+      src="/uploads/Wayneyu1.jpg">
+  <p class="site-author-name" itemprop="name">Wayne Yu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+        
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WayneYu430" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;WayneYu430" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wayneyu30@163.com" title="E-Mail → mailto:wayneyu30@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/10/12/Introduction-to-Computer-Systems-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Wayneyu1.jpg">
+      <meta itemprop="name" content="Wayne Yu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WayneYu">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Introduction to Computer Systems 3
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-10-12 14:20:12" itemprop="dateCreated datePublished" datetime="2020-10-12T14:20:12+08:00">2020-10-12</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-01-08 16:29:52" itemprop="dateModified" datetime="2021-01-08T16:29:52+08:00">2021-01-08</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/CMU-CS-15-213/" itemprop="url" rel="index"><span itemprop="name">CMU_CS_15-213</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/CMU-CS-15-213/%E6%B7%B1%E5%BA%A6%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">深度理解计算机系统</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Fractional-binary-numbers"><a href="#Fractional-binary-numbers" class="headerlink" title="Fractional binary numbers"></a>Fractional binary numbers</h1><p>浮点数不能完整的表达大多数的数字，只能使用浮动逼近的方法靠近</p>
+<a id="more"></a>
+
+<h2 id="IEEE-Floating-Point"><a href="#IEEE-Floating-Point" class="headerlink" title="IEEE Floating Point"></a>IEEE Floating Point</h2><p><img src="/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012094548407-1602483689083.png" alt="image-20201012094548407"></p>
+<ul>
+<li><p>单精度：32bits</p>
+<p>双精度：64bits</p>
+</li>
+<li><p>exp编码E（即2的幂次方数）</p>
+<ul>
+<li>000..00: denormalized</li>
+<li>111..11: special</li>
+<li>others: normalized</li>
+</ul>
+</li>
+<li><p>规格化的值</p>
+<ul>
+<li><p>E = exp -bias，对浮点数加权</p>
+<p>exp is unsigned,  Bias = 2^(k-1) -1;中间值；</p>
+<p><img src="/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012095136899-1602483689084.png" alt="image-20201012095136899"></p>
+</li>
+<li><p>M 隐含声明1的基数值</p>
+</li>
+</ul>
+<p><img src="/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012095453347-1602483689084.png" alt="image-20201012095453347"></p>
+</li>
+<li><p>非规格化的值 Denormalized Values</p>
+<ul>
+<li>此时M不包含隐含的1，即M仅为小数</li>
+<li>exp = (00..000)2进制 = 1<ul>
+<li>E = 1-Bias</li>
+<li>frac部分为0，则为+0or-0，sign位不同，IEEE定义下某些方面被认为是不同的</li>
+<li>frac部分不为0，则接近0.0</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>special</p>
+<ul>
+<li>exp = 11..111<ul>
+<li>frac = 00.00，代表无穷∞；operation overflows</li>
+<li>frac 不为00.000，代表Not-a-Number(NaN)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Example</p>
+<ul>
+<li><img src="/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012105329084-1602483689084.png" alt="image-20201012105329084"></li>
+</ul>
+</li>
+<li><p>Special Properties</p>
+<ul>
+<li>浮点数的0 同Integer的0 一样，全部位=0；</li>
+<li>几乎可以直接在无符号的情况下进行比较<ul>
+<li>比较符号位</li>
+<li>-0 = 0</li>
+<li>NaN的处理</li>
+<li>其他情况都是可以直接比较的</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Rounding"><a href="#Rounding" class="headerlink" title="Rounding"></a>Rounding</h2><p>浮点数并不能精准的表示所有数，比如0.2，在二进制下就只能使用提高小数位数的方法来提高精度，所以采用舍入（Rouding）的方式来进行逼近；</p>
+<ul>
+<li><p>基本原则：始终找到最接近的那个值进行舍入</p>
+</li>
+<li><p>IEEE四种方式进行舍入：向上舍入，向下舍入，向零舍入，向偶数舍入</p>
+<ul>
+<li><p>向偶数舍入，是将数字向上或向下舍入，使得结果的最低有效数字是偶数；而向零舍入则是向靠近零的值舍入；向上舍入则是向比它大的方向靠近；向下舍入则是向比它小的方向靠近。</p>
+<p><img src="/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012115936406-1602483689084.png" alt="image-20201012115936406"></p>
+</li>
+<li><p>除偶数舍入之外（有条件的舍入），其余三种舍入都有明确的边界；</p>
+</li>
+<li><p>使用偶数舍入：</p>
+<ul>
+<li>对一组数据进行舍入，计算平均数会存在统计偏差，例如向上，平均值比实际平均值高；而偶数是50%的50%；</li>
+<li>不想舍入到整数时，仅简单考虑最低有效位（LSB）是奇数还是偶数</li>
+</ul>
+</li>
+<li><p><strong>通常情况下我们采取的舍入规则是在原来的值是舍入值的中间值时，采取向偶数舍入，在二进制中，偶数我们认为是末尾为0的数。而倘若不是这种情况的话，则一般会有选择性的使用向上和向下舍入，但总是会向最接近的值舍入。其实这正是IEEE采取的默认的舍入方式，因为这种舍入方式总是企图向最近的值的舍入。</strong></p>
+<p><img src="/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012120642217-1602483689084.png" alt="image-20201012120642217"></p>
+</li>
+</ul>
+<h2 id="FP-Arithmetic"><a href="#FP-Arithmetic" class="headerlink" title="FP Arithmetic"></a>FP Arithmetic</h2><ul>
+<li>First compute exact result<br>▪ Make it fit into desired precision<br>▪ Possibly overflow if exponent too large<br>▪ Possibly round to fit into frac </li>
+</ul>
+<h3 id="FP-Multiplication"><a href="#FP-Multiplication" class="headerlink" title="FP Multiplication"></a>FP Multiplication</h3><p><img src="/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012120900089-1602483689084.png" alt="image-20201012120900089"></p>
+<h3 id="FP-Addition"><a href="#FP-Addition" class="headerlink" title="FP Addition"></a>FP Addition</h3><p><img src="/2020/10/12/Introduction-to-Computer-Systems-3/image-20201012121656648-1602483689084.png" alt="image-20201012121656648"></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Computer-System/" rel="tag"># Computer System</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/10/12/Introduction-to-Computer-Systems-1-2/" rel="prev" title="Introduction to Computer Systems 1&2">
+                  <i class="fa fa-chevron-left"></i> Introduction to Computer Systems 1&2
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/10/12/%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" rel="next" title="实验环境配置">
+                  实验环境配置 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne Yu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+      <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = '//cdn.jsdelivr.net/npm/mathjax@3.1.0/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

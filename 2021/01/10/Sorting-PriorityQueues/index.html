@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"8.0.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="Priority Queues优先队列优先队列数据结构原理回顾一下之前学习，任何一种数据结构的基本实现： 使用数组array&#x2F;（顺序结构）：即相同数据类型的元素按一定顺序排列的集合，是占用内存，时间复杂度低但空间复杂度高的数据结构 链表Linklist（链式结构）实现：即非连续，非顺序的一种动态的存储结构，空间复杂度低但时间复杂度高 考虑一个集合Collection如何插入或者删除元素？包括：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sorting-PriorityQueues">
+<meta property="og:url" content="http://example.com/2021/01/10/Sorting-PriorityQueues/index.html">
+<meta property="og:site_name" content="WayneYu">
+<meta property="og:description" content="Priority Queues优先队列优先队列数据结构原理回顾一下之前学习，任何一种数据结构的基本实现： 使用数组array&#x2F;（顺序结构）：即相同数据类型的元素按一定顺序排列的集合，是占用内存，时间复杂度低但空间复杂度高的数据结构 链表Linklist（链式结构）实现：即非连续，非顺序的一种动态的存储结构，空间复杂度低但时间复杂度高 考虑一个集合Collection如何插入或者删除元素？包括：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2021/01/10/Sorting-PriorityQueues/image-20210117123316175.png">
+<meta property="og:image" content="http://example.com/2021/01/10/Sorting-PriorityQueues/image-20210110224516322.png">
+<meta property="og:image" content="http://example.com/2021/01/10/Sorting-PriorityQueues/image-20210110225419499.png">
+<meta property="og:image" content="http://example.com/2021/01/10/Sorting-PriorityQueues/image-20210116215310945.png">
+<meta property="og:image" content="http://example.com/2021/01/10/Sorting-PriorityQueues/image-20210117123342955.png">
+<meta property="og:image" content="http://example.com/2021/01/10/Sorting-PriorityQueues/image-20210116223327576.png">
+<meta property="og:image" content="http://example.com/2021/01/10/Sorting-PriorityQueues/image-20210117121751666.png">
+<meta property="og:image" content="http://example.com/2021/01/10/Sorting-PriorityQueues/image-20210117121952581.png">
+<meta property="og:image" content="http://example.com/2021/01/10/Sorting-PriorityQueues/image-20210117122231487.png">
+<meta property="article:published_time" content="2021-01-10T14:25:00.000Z">
+<meta property="article:modified_time" content="2021-02-20T06:37:30.000Z">
+<meta property="article:author" content="Wayne Yu">
+<meta property="article:tag" content="Algorithms-4">
+<meta property="article:tag" content="Sorting">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/01/10/Sorting-PriorityQueues/image-20210117123316175.png">
+
+
+<link rel="canonical" href="http://example.com/2021/01/10/Sorting-PriorityQueues/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Sorting-PriorityQueues | WayneYu</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">WayneYu</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section">首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags" rel="section">标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories" rel="section">分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives" rel="section">归档</a>
+
+  </li>
+        <li class="menu-item menu-item-schedule">
+
+    <a href="/schedule" rel="section">日程表</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Priority-Queues%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97"><span class="nav-number">1.</span> <span class="nav-text">Priority Queues优先队列</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">优先队列数据结构原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97%E5%BA%94%E7%94%A8%E4%B8%BE%E4%BE%8B"><span class="nav-number">1.2.</span> <span class="nav-text">优先队列应用举例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E6%8E%92%E5%BA%8F%E6%95%B0%E7%BB%84%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.3.</span> <span class="nav-text">不排序数组的实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Binary-Heap%E4%BA%8C%E5%8F%89%E5%A0%86%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">Binary Heap二叉堆实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E5%8E%9F%E7%90%86"><span class="nav-number">2.1.</span> <span class="nav-text">基本概念和原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="nav-number">2.1.1.</span> <span class="nav-text">二叉树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E6%8E%92%E5%BA%8F%E4%BA%8C%E5%8F%89%E6%A0%91HeapSort-BinaryTree"><span class="nav-number">2.1.2.</span> <span class="nav-text">堆排序二叉树HeapSort BinaryTree</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E5%A0%86%E7%9A%84%E6%95%B0%E6%8D%AE%E6%93%8D%E4%BD%9C"><span class="nav-number">2.2.</span> <span class="nav-text">二叉堆的数据操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Swim"><span class="nav-number">2.2.1.</span> <span class="nav-text">Swim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Insertion"><span class="nav-number">2.2.2.</span> <span class="nav-text">Insertion</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sink"><span class="nav-number">2.2.3.</span> <span class="nav-text">Sink</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Del-Max"><span class="nav-number">2.2.4.</span> <span class="nav-text">Del Max</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E5%A0%86%E9%97%AE%E9%A2%98"><span class="nav-number">2.3.</span> <span class="nav-text">二叉堆问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97PQ%E5%AE%9E%E7%8E%B0cost"><span class="nav-number">2.4.</span> <span class="nav-text">优先队列PQ实现cost</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HeapSort%E5%A0%86%E6%8E%92%E5%BA%8F"><span class="nav-number">2.5.</span> <span class="nav-text">HeapSort堆排序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86"><span class="nav-number">2.5.1.</span> <span class="nav-text">基础原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.5.2.</span> <span class="nav-text">代码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#max-heap-%E8%87%AA%E4%B8%8B%E8%80%8C%E4%B8%8A%E7%9A%84%E6%96%B9%E6%B3%95bottom-up"><span class="nav-number">2.5.2.1.</span> <span class="nav-text">max-heap: 自下而上的方法bottom-up</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sort-down-%E9%80%90%E4%B8%AA%E7%A7%BB%E9%99%A4%E6%9C%80%E5%A4%A7%E9%A1%B9%EF%BC%8C%E5%AE%8C%E6%88%90%E6%8E%92%E5%BA%8F"><span class="nav-number">2.5.2.2.</span> <span class="nav-text">sort down: 逐个移除最大项，完成排序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%BD%A2%E5%88%86%E6%9E%90%E6%B3%95"><span class="nav-number">2.5.3.</span> <span class="nav-text">图形分析法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-number">2.5.4.</span> <span class="nav-text">性能分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%91%BD%E9%A2%98%E5%92%8C%E7%BB%93%E8%AE%BA"><span class="nav-number">2.5.5.</span> <span class="nav-text">相关命题和结论</span></a></li></ol></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wayne Yu"
+      src="/uploads/Wayneyu1.jpg">
+  <p class="site-author-name" itemprop="name">Wayne Yu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+        
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WayneYu430" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;WayneYu430" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wayneyu30@163.com" title="E-Mail → mailto:wayneyu30@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/10/Sorting-PriorityQueues/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Wayneyu1.jpg">
+      <meta itemprop="name" content="Wayne Yu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WayneYu">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Sorting-PriorityQueues
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-01-10 22:25:00" itemprop="dateCreated datePublished" datetime="2021-01-10T22:25:00+08:00">2021-01-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-02-20 14:37:30" itemprop="dateModified" datetime="2021-02-20T14:37:30+08:00">2021-02-20</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E3%80%8A%E7%AE%97%E6%B3%954%E3%80%8B/" itemprop="url" rel="index"><span itemprop="name">《算法4》</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Priority-Queues优先队列"><a href="#Priority-Queues优先队列" class="headerlink" title="Priority Queues优先队列"></a>Priority Queues优先队列</h1><h2 id="优先队列数据结构原理"><a href="#优先队列数据结构原理" class="headerlink" title="优先队列数据结构原理"></a>优先队列数据结构原理</h2><p>回顾一下之前学习，任何一种数据结构的基本实现：</p>
+<p>使用数组array/（顺序结构）：即相同数据类型的元素按一定顺序排列的集合，是占用内存，时间复杂度低但空间复杂度高的数据结构</p>
+<p>链表Linklist（链式结构）实现：即非连续，非顺序的一种动态的存储结构，空间复杂度低但时间复杂度高</p>
+<p>考虑一个集合Collection如何插入或者删除元素？包括：</p>
+<ul>
+<li>Stack: FILO先进后出</li>
+<li>Queue: FIFO先进先出</li>
+<li>Randomized queue：随机删除</li>
+<li>Priority queue：删除最大的元素/最小的元素（所谓的优先级）</li>
+</ul>
+<h2 id="优先队列应用举例"><a href="#优先队列应用举例" class="headerlink" title="优先队列应用举例"></a>优先队列应用举例</h2><ul>
+<li><p>在数据流大小为N的数据中找到M个最大的项/例如在交易系统中，M是缓存中最大的数量，而N是流式数据unbounded data；</p>
+<p>  优先队列应用图示：</p>
+  <img src="/2021/01/10/Sorting-PriorityQueues/image-20210117123316175.png" alt="image-20210117123316175" style="zoom:50%;">
+
+
+
+</li>
+</ul>
+<a id="more"></a>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 给出伪代码</span></span><br><span class="line">MinPQ&lt;Transaction&gt; pq = <span class="keyword">new</span> MinPQ&lt;Transaction&gt; ();</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(StdIn.hasNextLine())</span><br><span class="line">&#123;</span><br><span class="line">	String line = StdIn.readLine();</span><br><span class="line">	Transaction item = <span class="keyword">new</span> Transaction(line);</span><br><span class="line">	pq.insert(item);</span><br><span class="line">	<span class="keyword">while</span>(pq.size() &gt; M)&#123;</span><br><span class="line">		pq.DelMin();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="不排序数组的实现"><a href="#不排序数组的实现" class="headerlink" title="不排序数组的实现"></a>不排序数组的实现</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UnorderedMaxPQ</span>&lt;<span class="title">Key</span> <span class="keyword">extends</span> <span class="title">Comparable</span>&lt;<span class="title">Key</span>&gt;&gt;</span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Key[] pq; <span class="comment">// pq[i] = ith element on pq</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> N; <span class="comment">// number of elements on pq</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">UnorderedMaxPQ</span><span class="params">(<span class="keyword">int</span> capacity)</span></span></span><br><span class="line"><span class="function">    </span>&#123; pq = (Key[]) <span class="keyword">new</span> Comparable[capacity]; &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEmpty</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123; <span class="keyword">return</span> N == <span class="number">0</span>; &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(Key x)</span></span></span><br><span class="line"><span class="function">    </span>&#123; pq[N++] = x; &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Key <span class="title">delMax</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> max = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; N; i++)</span><br><span class="line">        	<span class="keyword">if</span> (less(max, i)) max = i;</span><br><span class="line">        exch(max, N-<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> pq[--N];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/2021/01/10/Sorting-PriorityQueues/image-20210110224516322.png" alt="image-20210110224516322" style="zoom: 50%;">
+
+<blockquote>
+<p>不难发现，实际上这种实现需要<code>MN</code>的time以及<code>M</code>的space，效率并不高</p>
+</blockquote>
+<h1 id="Binary-Heap二叉堆实现"><a href="#Binary-Heap二叉堆实现" class="headerlink" title="Binary Heap二叉堆实现"></a>Binary Heap二叉堆实现</h1><h2 id="基本概念和原理"><a href="#基本概念和原理" class="headerlink" title="基本概念和原理"></a>基本概念和原理</h2><h3 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h3><p>二叉树的概念：对于一个节点，要么为空，要么存在对应的左右子节点的树形结构；</p>
+<ul>
+<li><p>完全二叉树：除最后一层外，其余层都是平衡状态的（一定存在左右子节点）的二叉树；二叉树的平衡概念指的是左右子节点在某一层完全展开；</p>
+</li>
+<li><p>二叉树的性质</p>
+<ul>
+<li>N个节点的完全二叉树高度为$[lgN]$（2为底的log向下取整）；</li>
+<li>对于节点k，父亲节点位于k/2的位置上；</li>
+<li>对于节点k，子节点位于2k和2k+1的位置上；</li>
+</ul>
+</li>
+</ul>
+<h3 id="堆排序二叉树HeapSort-BinaryTree"><a href="#堆排序二叉树HeapSort-BinaryTree" class="headerlink" title="堆排序二叉树HeapSort BinaryTree"></a>堆排序二叉树HeapSort BinaryTree</h3><ul>
+<li>二叉堆的概念：<ul>
+<li>二叉堆：堆排序的完全二叉树的数组表现形式</li>
+</ul>
+</li>
+<li>堆排序二叉树：<ul>
+<li>节点的值表示keys键值</li>
+<li>父节点的键值大于两个（一个）子节点的键值</li>
+</ul>
+</li>
+</ul>
+<p>数组表示：</p>
+<p>使用数组的方式表示二叉堆，优点明显：在树上的移动方式是以数组的索引index进行的，不再需要额外的连接（eg，单链表中指向下一个节点的指针）；</p>
+<p>即，可以利用数组的下标+二叉树的节点特性完成对该数据结构的解释和理解；</p>
+<img src="/2021/01/10/Sorting-PriorityQueues/image-20210110225419499.png" alt="image-20210110225419499" style="zoom:80%;">
+
+<h2 id="二叉堆的数据操作"><a href="#二叉堆的数据操作" class="headerlink" title="二叉堆的数据操作"></a>二叉堆的数据操作</h2><h3 id="Swim"><a href="#Swim" class="headerlink" title="Swim"></a>Swim</h3><p>当子节点的key比父节点的大，需要改变此节点的位置从而将现有结构合法；</p>
+<ul>
+<li>交换子节点的key和父节点的key；</li>
+<li>循环，直到整个堆重新完成排序；</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">swim</span><span class="params">(<span class="keyword">int</span> k)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">while</span>(k&gt;<span class="number">1</span> &amp;&amp; less(k/<span class="number">2</span>, k))	<span class="comment">// 父节点更小</span></span><br><span class="line">	&#123;</span><br><span class="line">		exch(k, k/<span class="number">2</span>);	<span class="comment">// 交换子和父</span></span><br><span class="line">		k = k/<span class="number">2</span>;	<span class="comment">// 自底向上，找到下一个父亲，完成堆排序</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下图中，T节点不合法，因为此时T节点大于父节点P；需要swim操作。可以看到，swim操作将节点的操作改变在每一级进行操作（减少了比较和交换的次数）</p>
+<img src="/2021/01/10/Sorting-PriorityQueues/image-20210116215310945.png" alt="image-20210116215310945" style="zoom:80%;">
+
+<h3 id="Insertion"><a href="#Insertion" class="headerlink" title="Insertion"></a>Insertion</h3><p>有了swim操作，插入新节点的操作变得也很简单；</p>
+<p>二叉堆中插入一个节点，将其插入最后一个位置，然后对其进行swim操作，保持数据结构的完整性；</p>
+<p>最多$1+lgN$次比较（回到根节点）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(key x)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	pq[++N] = x;</span><br><span class="line">	swim(N);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Sink"><a href="#Sink" class="headerlink" title="Sink"></a>Sink</h3><p>当父节点的key小于子节点（一个或者both），需要将父节点向下找到合适的位置，保证二叉堆结构的排序；</p>
+<p>合适的位置：找到子节点中较大的节点，保证交换之后新的父节点一定比两个子节点都大（二叉堆的顺序）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">sink</span><span class="params">(<span class="keyword">int</span> K)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">while</span>(<span class="number">2</span>*k &lt;= N)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> j = <span class="number">2</span>*k	<span class="comment">//	左边子节点的位置</span></span><br><span class="line">		<span class="keyword">if</span>(j&lt;N &amp;&amp; less(j, j+<span class="number">1</span>))	j++;	<span class="comment">//找到最大子节点的位置</span></span><br><span class="line">		<span class="keyword">if</span>(!less(k, j))		<span class="keyword">break</span>;		<span class="comment">// 如果加入的节点比子节点（2k+1）小，则完成；</span></span><br><span class="line">		exch(k, j);</span><br><span class="line">		k = j;	<span class="comment">//	向下遍历所有节点</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/2021/01/10/Sorting-PriorityQueues/image-20210117123342955.png" alt="image-20210117123342955" style="zoom: 50%;">
+
+<h3 id="Del-Max"><a href="#Del-Max" class="headerlink" title="Del Max"></a>Del Max</h3><p>有了sink操作，可以很轻松的对二叉堆中键值最大的节点（根节点）</p>
+<p>交换键值和根节点，然后从根节点开始，进行sink操作；</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Key <span class="title">delMax</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Key max = pq[<span class="number">1</span>];</span><br><span class="line">	exch(max, N--);</span><br><span class="line">	sink(<span class="number">1</span>);</span><br><span class="line">	pq[N+<span class="number">1</span>] = <span class="keyword">null</span>;		<span class="comment">// 防止最后闲置，导致java的回收机制失败</span></span><br><span class="line">	<span class="keyword">return</span> max;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二叉堆问题"><a href="#二叉堆问题" class="headerlink" title="二叉堆问题"></a>二叉堆问题</h2><ul>
+<li><p>不可变键问题Immutability </p>
+<p>优先队列的二叉堆是固定大小为N的数组实现，即在java中声明为<code>private final</code>，即一旦创建就不可改变了；</p>
+</li>
+</ul>
+<p>Java内置的不变类型：</p>
+<ul>
+<li><p>Immutable: String, Integer, Double, Color, Vector, Transaction;</p>
+</li>
+<li><p>Mutable: StringBuilder, Stack, Counter, Java Array</p>
+</li>
+</ul>
+<h2 id="优先队列PQ实现cost"><a href="#优先队列PQ实现cost" class="headerlink" title="优先队列PQ实现cost"></a>优先队列PQ实现cost</h2><img src="/2021/01/10/Sorting-PriorityQueues/image-20210116223327576.png" alt="image-20210116223327576" style="zoom:50%;">
+
+<h2 id="HeapSort堆排序"><a href="#HeapSort堆排序" class="headerlink" title="HeapSort堆排序"></a>HeapSort堆排序</h2><h3 id="基础原理"><a href="#基础原理" class="headerlink" title="基础原理"></a>基础原理</h3><ul>
+<li>堆排序的基础思想是使用原地排序的思想</li>
+<li>对于N个键值的数据，创造一个max-heap</li>
+<li>逐个重复的移出最大项</li>
+</ul>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><h4 id="max-heap-自下而上的方法bottom-up"><a href="#max-heap-自下而上的方法bottom-up" class="headerlink" title="max-heap: 自下而上的方法bottom-up"></a>max-heap: 自下而上的方法bottom-up</h4><p>构建一个合法的堆结构，自下而上的调用sink方法，使得每一个节点找到合适的位置（<strong>原地排序</strong>）</p>
+<p>实际上就是遍历完全部的父节点，判断<strong>对于二叉堆结构</strong>，每一个父节点是否合法；</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> k= N/<span class="number">2</span>; k &gt;= <span class="number">1</span>; k--)	<span class="comment">// 从最后一个节点的父节点开始</span></span><br><span class="line">	sink(a, k, N);</span><br></pre></td></tr></table></figure>
+
+<img src="/2021/01/10/Sorting-PriorityQueues/image-20210117121751666.png" alt="image-20210117121751666" style="zoom: 50%;">
+
+<h4 id="sort-down-逐个移除最大项，完成排序"><a href="#sort-down-逐个移除最大项，完成排序" class="headerlink" title="sort down: 逐个移除最大项，完成排序"></a>sort down: 逐个移除最大项，完成排序</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(N&gt;<span class="number">1</span>)</span><br><span class="line">&#123;</span><br><span class="line">	exch(a, <span class="number">1</span>, N--);</span><br><span class="line">	sink(a, <span class="number">1</span>, N);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/01/10/Sorting-PriorityQueues/image-20210117121952581.png" alt="image-20210117121952581"></p>
+<h3 id="图形分析法"><a href="#图形分析法" class="headerlink" title="图形分析法"></a>图形分析法</h3><p>算法的轨迹</p>
+<img src="/2021/01/10/Sorting-PriorityQueues/image-20210117122231487.png" alt="image-20210117122231487" style="zoom:67%;">
+
+<h3 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h3><p>堆的构建：<code>&lt;=</code> $2N$ compares and exchanges</p>
+<p>堆的排序：<code>&lt;=</code> $2NlgN$ compares and exchanges</p>
+<h3 id="相关命题和结论"><a href="#相关命题和结论" class="headerlink" title="相关命题和结论"></a>相关命题和结论</h3><ul>
+<li><p>原地排序：</p>
+<ul>
+<li>原地排序就是指在排序过程中不申请多余的存储空间，只利用原来存储待排数据的存储空间进行比较和交换的数据排序。</li>
+<li>属于原地排序的是：<strong>希尔排序、冒泡排序、插入排序、选择排序、堆排序、快速排序</strong>。</li>
+</ul>
+</li>
+<li><p>优点</p>
+<p>原地算法：</p>
+<p>worst-case会到$NlgN$ 的性能</p>
+</li>
+<li><p>缺点：</p>
+<p>虽然堆排序能够在空间和时间上有提升和优化，但是</p>
+<ul>
+<li>内循环inner-loop比qsort长</li>
+<li>没有有效利用cache memory</li>
+<li>not stable</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Algorithms-4/" rel="tag"># Algorithms-4</a>
+              <a href="/tags/Sorting/" rel="tag"># Sorting</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/01/08/Sorting-2-2-Classic-Sort/" rel="prev" title="Sorting-2-2-Classic-Sort">
+                  <i class="fa fa-chevron-left"></i> Sorting-2-2-Classic-Sort
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/01/12/Searching-Elementary-Symbol-Tables/" rel="next" title="Searching-Elementary-Symbol-Tables">
+                  Searching-Elementary-Symbol-Tables <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne Yu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+      <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = '//cdn.jsdelivr.net/npm/mathjax@3.1.0/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

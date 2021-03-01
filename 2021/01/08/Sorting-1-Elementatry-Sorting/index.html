@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"8.0.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="Elementatry-Sorting排序算法Sorting的基础概念rule of the gameCallbacks回调机制 目标：sort any type of data  将函数作为实参传递给其他函数  不同编程语言有不同的回调机制实现  Java：interfaces C: function pointers Pyton: first-class function    算法分析的模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sorting-1-Elementatry-Sorting">
+<meta property="og:url" content="http://example.com/2021/01/08/Sorting-1-Elementatry-Sorting/index.html">
+<meta property="og:site_name" content="WayneYu">
+<meta property="og:description" content="Elementatry-Sorting排序算法Sorting的基础概念rule of the gameCallbacks回调机制 目标：sort any type of data  将函数作为实参传递给其他函数  不同编程语言有不同的回调机制实现  Java：interfaces C: function pointers Pyton: first-class function    算法分析的模型">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2021/01/08/Sorting-1-Elementatry-Sorting/image-20210105122736196.png">
+<meta property="og:image" content="http://example.com/2021/01/08/Sorting-1-Elementatry-Sorting/image-20210105132423563.png">
+<meta property="og:image" content="http://example.com/2021/01/08/Sorting-1-Elementatry-Sorting/image-20210105133930376.png">
+<meta property="article:published_time" content="2021-01-08T07:06:13.000Z">
+<meta property="article:modified_time" content="2021-01-08T08:29:46.509Z">
+<meta property="article:author" content="Wayne Yu">
+<meta property="article:tag" content="Algorithms-4">
+<meta property="article:tag" content="Sorting">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/01/08/Sorting-1-Elementatry-Sorting/image-20210105122736196.png">
+
+
+<link rel="canonical" href="http://example.com/2021/01/08/Sorting-1-Elementatry-Sorting/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Sorting-1-Elementatry-Sorting | WayneYu</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">WayneYu</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section">首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags" rel="section">标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories" rel="section">分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives" rel="section">归档</a>
+
+  </li>
+        <li class="menu-item menu-item-schedule">
+
+    <a href="/schedule" rel="section">日程表</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Elementatry-Sorting"><span class="nav-number">1.</span> <span class="nav-text">Elementatry-Sorting</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95Sorting%E7%9A%84%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">排序算法Sorting的基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rule-of-the-game"><span class="nav-number">1.1.1.</span> <span class="nav-text">rule of the game</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Callbacks%E5%9B%9E%E8%B0%83%E6%9C%BA%E5%88%B6"><span class="nav-number">1.1.1.0.1.</span> <span class="nav-text">Callbacks回调机制</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90%E7%9A%84%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.1.2.</span> <span class="nav-text">算法分析的模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%B4%E6%97%B6%E6%A8%A1%E6%9D%BF"><span class="nav-number">1.1.3.</span> <span class="nav-text">临时模板</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">基础原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BE%E5%BD%A2%E5%88%86%E6%9E%90%E6%B3%95"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">图形分析法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%8F%E9%AA%8C%E6%80%A7%E5%88%86%E6%9E%90"><span class="nav-number">1.1.3.4.</span> <span class="nav-text">经验性分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-number">1.1.3.5.</span> <span class="nav-text">性能分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%91%BD%E9%A2%98%E5%92%8C%E7%BB%93%E8%AE%BA"><span class="nav-number">1.1.3.6.</span> <span class="nav-text">相关命题和结论</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Complexity-of-sorting"><span class="nav-number">1.1.4.</span> <span class="nav-text">Complexity of sorting</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%93%E8%AE%BAPropositions%EF%BC%9A"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">结论Propositions：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Stability"><span class="nav-number">1.1.5.</span> <span class="nav-text">Stability</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java"><span class="nav-number">1.2.</span> <span class="nav-text">Java</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Assertions"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">Assertions</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ElementarySorts"><span class="nav-number">2.</span> <span class="nav-text">ElementarySorts</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Selection-Sort"><span class="nav-number">2.1.</span> <span class="nav-text">Selection Sort</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86-1"><span class="nav-number">2.1.0.1.</span> <span class="nav-text">基础原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-1"><span class="nav-number">2.1.0.2.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BE%E5%BD%A2%E5%88%86%E6%9E%90%E6%B3%95-1"><span class="nav-number">2.1.0.3.</span> <span class="nav-text">图形分析法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90-1"><span class="nav-number">2.1.0.4.</span> <span class="nav-text">性能分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%91%BD%E9%A2%98%E5%92%8C%E7%BB%93%E8%AE%BA-1"><span class="nav-number">2.1.0.5.</span> <span class="nav-text">相关命题和结论</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Insertion-Sort"><span class="nav-number">2.2.</span> <span class="nav-text">Insertion Sort</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86-2"><span class="nav-number">2.2.0.1.</span> <span class="nav-text">基础原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-2"><span class="nav-number">2.2.0.2.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BE%E5%BD%A2%E5%88%86%E6%9E%90%E6%B3%95-2"><span class="nav-number">2.2.0.3.</span> <span class="nav-text">图形分析法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%8F%E9%AA%8C%E6%80%A7%E5%88%86%E6%9E%90-1"><span class="nav-number">2.2.0.4.</span> <span class="nav-text">经验性分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90-2"><span class="nav-number">2.2.0.5.</span> <span class="nav-text">性能分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%91%BD%E9%A2%98%E5%92%8C%E7%BB%93%E8%AE%BA-2"><span class="nav-number">2.2.0.6.</span> <span class="nav-text">相关命题和结论</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ShellSort"><span class="nav-number">2.2.1.</span> <span class="nav-text">ShellSort</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86-3"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">基础原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-3"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BE%E5%BD%A2%E5%88%86%E6%9E%90%E6%B3%95-3"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">图形分析法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%8F%E9%AA%8C%E6%80%A7%E5%88%86%E6%9E%90-2"><span class="nav-number">2.2.1.4.</span> <span class="nav-text">经验性分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90-3"><span class="nav-number">2.2.1.5.</span> <span class="nav-text">性能分析</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wayne Yu"
+      src="/uploads/Wayneyu1.jpg">
+  <p class="site-author-name" itemprop="name">Wayne Yu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+        
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WayneYu430" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;WayneYu430" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wayneyu30@163.com" title="E-Mail → mailto:wayneyu30@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/08/Sorting-1-Elementatry-Sorting/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Wayneyu1.jpg">
+      <meta itemprop="name" content="Wayne Yu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WayneYu">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Sorting-1-Elementatry-Sorting
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-01-08 15:06:13 / 修改时间：16:29:46" itemprop="dateCreated datePublished" datetime="2021-01-08T15:06:13+08:00">2021-01-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E3%80%8A%E7%AE%97%E6%B3%954%E3%80%8B/" itemprop="url" rel="index"><span itemprop="name">《算法4》</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Elementatry-Sorting"><a href="#Elementatry-Sorting" class="headerlink" title="Elementatry-Sorting"></a>Elementatry-Sorting</h1><h2 id="排序算法Sorting的基础概念"><a href="#排序算法Sorting的基础概念" class="headerlink" title="排序算法Sorting的基础概念"></a>排序算法Sorting的基础概念</h2><h3 id="rule-of-the-game"><a href="#rule-of-the-game" class="headerlink" title="rule of the game"></a>rule of the game</h3><h5 id="Callbacks回调机制"><a href="#Callbacks回调机制" class="headerlink" title="Callbacks回调机制"></a>Callbacks回调机制</h5><ul>
+<li><p>目标：sort any type of data</p>
+</li>
+<li><p>将函数作为实参传递给其他函数</p>
+</li>
+<li><p>不同编程语言有不同的回调机制实现</p>
+<ul>
+<li>Java：interfaces</li>
+<li>C: function pointers</li>
+<li>Pyton: first-class function</li>
+</ul>
+</li>
+</ul>
+<h3 id="算法分析的模型"><a href="#算法分析的模型" class="headerlink" title="算法分析的模型"></a>算法分析的模型</h3><p>在算法4中总结了课程的算法学习思路和框架，总结如下：</p>
+<ol>
+<li><p>基础原理，基础想法</p>
+</li>
+<li><p>代码实现：Java</p>
+<p> 算法的模板；</p>
+</li>
+<li><p>图形分析法：</p>
+<ul>
+<li>包括函数调用和数组的trace</li>
+<li>animation</li>
+<li>自己理解的图画</li>
+</ul>
+</li>
+<li><p>经验性分析：</p>
+<ul>
+<li>大致估算的运行时间</li>
+<li>算法的优势和劣势</li>
+<li>对比其他算法</li>
+</ul>
+</li>
+<li><p>性能分析：Sorting Complexity: 学习算法性能的框架模型</p>
+<ul>
+<li>Model of computation: e.g. allowable operations</li>
+<li>Cost model: <strong>Number of compares &amp;&amp; array access || memory space</strong></li>
+<li>Upper bound: Cost guarantee provided by <strong>some</strong> algorithm for X.</li>
+<li>Lower bound: Proven limit on cost guarantee of <strong>all</strong> algorithms for X</li>
+<li>Optimal algorithm: best possible cost guarantee (practical improvement)</li>
+</ul>
+</li>
+<li><p>相关的命题结论</p>
+</li>
+</ol>
+<a id="more"></a>
+
+<hr>
+<h3 id="临时模板"><a href="#临时模板" class="headerlink" title="临时模板"></a>临时模板</h3><h4 id="基础原理"><a href="#基础原理" class="headerlink" title="基础原理"></a>基础原理</h4><h4 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h4><h4 id="图形分析法"><a href="#图形分析法" class="headerlink" title="图形分析法"></a>图形分析法</h4><h4 id="经验性分析"><a href="#经验性分析" class="headerlink" title="经验性分析"></a>经验性分析</h4><h4 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h4><h4 id="相关命题和结论"><a href="#相关命题和结论" class="headerlink" title="相关命题和结论"></a>相关命题和结论</h4><hr>
+<h3 id="Complexity-of-sorting"><a href="#Complexity-of-sorting" class="headerlink" title="Complexity of sorting"></a>Complexity of sorting</h3><p>分析算法复杂读的统一框架</p>
+<p>Example: sorting.</p>
+<ul>
+<li>Model of computation: decision tree.    // 比较即可读取数组</li>
+<li>Cost model: # compares. </li>
+<li>Upper bound: $~ N lg N$ from mergesort. </li>
+<li>Lower bound: $~ N lg N$</li>
+<li>Optimal algorithm:  = <strong>mergesort</strong></li>
+</ul>
+<h4 id="结论Propositions："><a href="#结论Propositions：" class="headerlink" title="结论Propositions："></a>结论Propositions：</h4><p> Any compare-based sorting algorithm must use at least：<br>$$<br>lg ( N ! ) =&gt; N lg N<br>$$<br> compares in the worst-case.</p>
+<p>证明：</p>
+<p>$2 h ≥  leaves ≥ N !<br>  ⇒   h ≥ lg ( N ! ) ~ N lg N$</p>
+<ul>
+<li><p>归并排序已经被数学证明是最优算法（仅在比较次数上），即算法的上界和下界都是NlgN；</p>
+</li>
+<li><p>空间上最优？</p>
+</li>
+</ul>
+<h3 id="Stability"><a href="#Stability" class="headerlink" title="Stability"></a>Stability</h3><p>算法的稳定性指的是：一个排序算法能够将有相同key的对象经过排序后保持原来的顺序</p>
+<p>Stable sort：</p>
+<table>
+<thead>
+<tr>
+<th>Stable</th>
+<th>Unstable</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Insertion Sort</td>
+<td>selection sort</td>
+</tr>
+<tr>
+<td>mergesort</td>
+<td>shellsort</td>
+</tr>
+</tbody></table>
+<p>Note：检查代码的”less than“ &lt; 和 ”less than or equal to“ &lt;=</p>
+<ul>
+<li>长距离的交换会使排序算法不稳定</li>
+</ul>
+<h2 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h2><h4 id="Assertions"><a href="#Assertions" class="headerlink" title="Assertions"></a>Assertions</h4><p>用于测试程序的真假；</p>
+<ul>
+<li>寻找逻辑bugs</li>
+</ul>
+<p>运行时默认关闭，需要时开启</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">java -ea MyProgram <span class="comment">// enable assertions</span></span><br><span class="line">java -da MyProgram <span class="comment">// disable assertions (default)</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="ElementarySorts"><a href="#ElementarySorts" class="headerlink" title="ElementarySorts"></a>ElementarySorts</h1><h2 id="Selection-Sort"><a href="#Selection-Sort" class="headerlink" title="Selection Sort"></a>Selection Sort</h2><h4 id="基础原理-1"><a href="#基础原理-1" class="headerlink" title="基础原理"></a>基础原理</h4><ul>
+<li>从左到右依次扫描数组，找出数组中最小的数并和第一个数字交换，依次往后</li>
+<li>外循环遍历数组，将指针往后移动，内循环找到未排序部分最小的数字，并进行交换</li>
+</ul>
+<h4 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Selection</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(Comparable[] a)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">int</span> N = a.length;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;N; i++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">int</span> min = i;	<span class="comment">// 最小数字的下标，初始化为第一个数字</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="keyword">int</span> j=i+<span class="number">1</span>; j&lt;N; j++)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">if</span>(less(a[j], a[i]))	min = j;	<span class="comment">// 找到最小数字的下标</span></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">		exch(a, i, min);	<span class="comment">//交换两个数字</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">less</span><span class="params">(Comparable v, Comparable w)</span></span></span><br><span class="line"><span class="function"> 	</span>&#123; <span class="comment">/* as before */</span> &#125;</span><br><span class="line"> 	</span><br><span class="line"> 	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">exch</span><span class="params">(Comparable[] a, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span></span></span><br><span class="line"><span class="function"> 	</span>&#123; <span class="comment">/* as before */</span> &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="图形分析法-1"><a href="#图形分析法-1" class="headerlink" title="图形分析法"></a>图形分析法</h4><p>代码函数运行的trace如下：</p>
+<p><img src="/2021/01/08/Sorting-1-Elementatry-Sorting/image-20210105122736196.png" alt="image-20210105122736196"></p>
+<h4 id="性能分析-1"><a href="#性能分析-1" class="headerlink" title="性能分析"></a>性能分析</h4><ul>
+<li>Selection sort uses (N– 1) + (N– 2) + … + 1 + 0 ~ <strong>N^2^ / 2</strong> compares and <strong>N</strong> exchanges.</li>
+</ul>
+<h4 id="相关命题和结论-1"><a href="#相关命题和结论-1" class="headerlink" title="相关命题和结论"></a>相关命题和结论</h4><ul>
+<li>对输入不敏感：Quadratic time 二次时间，即使array is sorted</li>
+<li>最小的数据移动：Linear exchanges ~ 一共N次交换</li>
+</ul>
+<h2 id="Insertion-Sort"><a href="#Insertion-Sort" class="headerlink" title="Insertion Sort"></a>Insertion Sort</h2><h4 id="基础原理-2"><a href="#基础原理-2" class="headerlink" title="基础原理"></a>基础原理</h4><ul>
+<li>从左到右依次扫描数组，每次读取数组中下一个数字插入到1~i已经排好序的位置中；</li>
+<li>外循环移动数组指针，每次读取一个数字；内循环遍历已经排好序的左边数组，进行比较，并插入</li>
+</ul>
+<h4 id="代码实现-2"><a href="#代码实现-2" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Insertion</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(Comparable[] a)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">int</span> N = a.length;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;N; i++)</span><br><span class="line">			<span class="keyword">for</span>(<span class="keyword">int</span> j=i; j&gt;<span class="number">0</span>; j--)</span><br><span class="line">				<span class="keyword">if</span>(less(a[j], a[j-<span class="number">1</span>]))</span><br><span class="line">					exch(a, j, j-<span class="number">1</span>);</span><br><span class="line">				<span class="keyword">else</span> <span class="keyword">break</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 写法同</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;N; i++)</span><br><span class="line">			<span class="keyword">for</span>(<span class="keyword">int</span> j=i; j&gt;<span class="number">0</span> &amp;&amp; less(a[j], a[j-<span class="number">1</span>]); j--)</span><br><span class="line">                exch(a, j, j-<span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">less</span><span class="params">(Comparable v, Comparable w)</span></span></span><br><span class="line"><span class="function"> 	</span>&#123; <span class="comment">/* as before */</span> &#125;</span><br><span class="line"> 	</span><br><span class="line"> 	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">exch</span><span class="params">(Comparable[] a, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span></span></span><br><span class="line"><span class="function"> 	</span>&#123; <span class="comment">/* as before */</span> &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="图形分析法-2"><a href="#图形分析法-2" class="headerlink" title="图形分析法"></a>图形分析法</h4><p>算法轨迹如下，可以看到只保持左边的数组有序，不断读取右边数组，类似洗牌的方式：</p>
+<p><img src="/2021/01/08/Sorting-1-Elementatry-Sorting/image-20210105132423563.png" alt="image-20210105132423563"></p>
+<h4 id="经验性分析-1"><a href="#经验性分析-1" class="headerlink" title="经验性分析"></a>经验性分析</h4><h4 id="性能分析-2"><a href="#性能分析-2" class="headerlink" title="性能分析"></a>性能分析</h4><ul>
+<li>insertion sort uses ~ ¼ N^2^ compares and ~ ¼ N^2^ exchanges on average</li>
+<li>Best case: If the array is in ascending order, insertion sort makes <strong>N- 1</strong> compares and <strong>0</strong> exchanges.</li>
+<li>Worst case:  . If the array is in descending order (and no duplicates), insertion sort makes ~ ½ N^2^ compares and ~ ½ N^2^ exchanges.</li>
+</ul>
+<h4 id="相关命题和结论-2"><a href="#相关命题和结论-2" class="headerlink" title="相关命题和结论"></a>相关命题和结论</h4><ul>
+<li><p>部分排序的数组</p>
+<p>  反转，Invesion：pair of keys that are out of order</p>
+</li>
+<li><p>对于部分排序的数组，插入排序运行时间为线性的linear time</p>
+<p>  Pf: Number of exchanges equals the number of inversions</p>
+<p>  -&gt; exchanges + (N-1) = number of compares；</p>
+</li>
+</ul>
+<h3 id="ShellSort"><a href="#ShellSort" class="headerlink" title="ShellSort"></a>ShellSort</h3><h4 id="基础原理-3"><a href="#基础原理-3" class="headerlink" title="基础原理"></a>基础原理</h4><ul>
+<li>以h为步长移动待排序的数组，不断减少h步长，使用插入排序，直到步长=1，则排序完成；</li>
+<li>迭代的方法实现；</li>
+<li>使用插入排序：<ul>
+<li>当h很大时，排序的数组为小的子数组；</li>
+<li>h不断减小，接近排序完成。</li>
+</ul>
+</li>
+</ul>
+<h4 id="代码实现-3"><a href="#代码实现-3" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Insertion</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(Comparable[] a)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">int</span> N = a.length;</span><br><span class="line">		<span class="keyword">int</span> h = <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">while</span>(h &lt; N/<span class="number">3</span>) h = <span class="number">3</span>*h+<span class="number">1</span>;	<span class="comment">// 构造递增步长数组=1， 4，13，40，121</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">while</span>(h &gt;= <span class="number">1</span>)</span><br><span class="line">		&#123;	<span class="comment">// 进行h-sort</span></span><br><span class="line">			<span class="comment">// h步长的插入排序</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="keyword">int</span> i =h; i&lt; N; i += h)&#123;</span><br><span class="line">				<span class="keyword">for</span>(<span class="keyword">int</span> j=i; j&gt;=h &amp;&amp; less(a[j], a[j-h]); j-=h)</span><br><span class="line">					exch(a, j, j-h);</span><br><span class="line">			&#125;</span><br><span class="line">			h = h/<span class="number">3</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">less</span><span class="params">(Comparable v, Comparable w)</span></span></span><br><span class="line"><span class="function"> 	</span>&#123; <span class="comment">/* as before */</span> &#125;</span><br><span class="line"> 	</span><br><span class="line"> 	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">exch</span><span class="params">(Comparable[] a, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span></span></span><br><span class="line"><span class="function"> 	</span>&#123; <span class="comment">/* as before */</span> &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Much, much more quickly</p>
+<h4 id="图形分析法-3"><a href="#图形分析法-3" class="headerlink" title="图形分析法"></a>图形分析法</h4><p>以h步长为7，3，1进行排序</p>
+<p><img src="/2021/01/08/Sorting-1-Elementatry-Sorting/image-20210105133930376.png" alt="image-20210105133930376"></p>
+<h4 id="经验性分析-2"><a href="#经验性分析-2" class="headerlink" title="经验性分析"></a>经验性分析</h4><ul>
+<li>实践中有用<ul>
+<li>当数组的size非常大的时候；</li>
+<li>嵌入式系统/硬件排序系统</li>
+</ul>
+</li>
+<li>递增序列的构造导致算法<u>不能完全的分析</u></li>
+</ul>
+<h4 id="性能分析-3"><a href="#性能分析-3" class="headerlink" title="性能分析"></a>性能分析</h4><p>The worst-case number of compares used by shellsort with the 3x+1 increments is <strong>O(N^3/2^)</strong></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Algorithms-4/" rel="tag"># Algorithms-4</a>
+              <a href="/tags/Sorting/" rel="tag"># Sorting</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/12/22/SSL-TLS/" rel="prev" title="SSL&TLS">
+                  <i class="fa fa-chevron-left"></i> SSL&TLS
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/01/08/Sorting-2-2-Classic-Sort/" rel="next" title="Sorting-2-2-Classic-Sort">
+                  Sorting-2-2-Classic-Sort <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne Yu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+      <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = '//cdn.jsdelivr.net/npm/mathjax@3.1.0/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
