@@ -191,7 +191,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives">
         
-          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-count">22</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -204,7 +204,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -243,6 +243,344 @@
       
 
       
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/Graph-Undirected-Graphs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Wayneyu1.jpg">
+      <meta itemprop="name" content="Wayne Yu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WayneYu">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/10/Graph-Undirected-Graphs/" class="post-title-link" itemprop="url">Graph-Undirected Graphs</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-03-10 09:32:54" itemprop="dateCreated datePublished" datetime="2021-03-10T09:32:54+08:00">2021-03-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-03-15 21:28:16" itemprop="dateModified" datetime="2021-03-15T21:28:16+08:00">2021-03-15</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E3%80%8A%E7%AE%97%E6%B3%954%E3%80%8B/" itemprop="url" rel="index"><span itemprop="name">《算法4》</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Graph"><a href="#Graph" class="headerlink" title="Graph"></a>Graph</h1><h2 id="Graph表示"><a href="#Graph表示" class="headerlink" title="Graph表示"></a>Graph表示</h2><p>在课程中，使用Integer来表示顶点0~V-1；但在实际应用中，只需使用一个HashTable来对Integer表示的顶点和实际value来进行转换即可</p>
+<img src="/2021/03/10/Graph-Undirected-Graphs/image-20210310094132905.png" alt="image-20210310094132905" style="zoom:33%;">
+
+<p>考虑自环和平行边两种特殊情况</p>
+<img src="/2021/03/10/Graph-Undirected-Graphs/image-20210310094143973.png" alt="image-20210310094143973" style="zoom:33%;">
+
+<ul>
+<li><p>Graph API</p>
+<img src="/2021/03/10/Graph-Undirected-Graphs/image-20210310094211375.png" alt="image-20210310094211375" style="zoom:50%;">
+</li>
+<li><p>Graph Processing code</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">degree</span><span class="params">(Graph G, <span class="keyword">int</span> v)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">     <span class="keyword">int</span> degree = <span class="number">0</span>;</span><br><span class="line">     <span class="keyword">for</span> (<span class="keyword">int</span> w : G.adj(v)) degree++;</span><br><span class="line">     <span class="keyword">return</span> degree;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ...... 图的基本处理</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用边连接图的顶点</p>
+<p>如何实现？==&gt; LinkedList or Array/两种最基础的数据结构</p>
+<ol>
+<li><p>Array尝试：使用一个二维数组矩阵，表示两个顶点的连接关系，这样会产生V^2的空间</p>
+<img src="/2021/03/10/Graph-Undirected-Graphs/image-20210310094810971.png" alt="image-20210310094810971" style="zoom: 33%;">
+</li>
+<li><p>以顶点作为索引的Lists，每个顶点对应一个Bag对象，储存其邻居</p>
+<img src="/2021/03/10/Graph-Undirected-Graphs/image-20210310094937064.png" alt="image-20210310094937064" style="zoom: 33%;">
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将Graph和Graph processing的客户端分离开，解耦</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Graph</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> V;</span><br><span class="line">	<span class="keyword">private</span> Bag&lt;Integer&gt;[] adj;	<span class="comment">// 使用邻接的Bag数组对象来保存每个顶点的邻居</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> Graph</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">this</span>.V = V;</span><br><span class="line">		adj = (Bag&lt;Integer&gt;[]) <span class="keyword">new</span> Bag[V];</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;V; i++)</span><br><span class="line">		&#123;</span><br><span class="line">			adj[i] = <span class="keyword">new</span> Bag&lt;Integer&gt;();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addEdge</span><span class="params">(<span class="keyword">int</span> v, <span class="keyword">int</span> w)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		adj[v].add(w);</span><br><span class="line">		adj[w].add(v);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Iterable&lt;Integer&gt; <span class="title">adj</span><span class="params">(<span class="keyword">int</span> v)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> adj[v];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实际应用中，使用邻接链表来表示一个图的边，现实中的图呈稀疏图</p>
+<img src="/2021/03/10/Graph-Undirected-Graphs/image-20210310095139268.png" alt="image-20210310095139268" style="zoom:33%;">
+
+</li>
+</ol>
+</li>
+</ul>
+<h1 id="DFS-Depth-First-Search"><a href="#DFS-Depth-First-Search" class="headerlink" title="DFS-Depth First Search"></a>DFS-Depth First Search</h1><p>深度优先搜索的基础概念来源于走迷宫</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">起始条件：向前方投掷一根有球标记的绳；</span><br><span class="line">递归函数主体：标记走过的路径交点和路</span><br><span class="line">递归停止条件：若前方无路，则回退一步</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Mark v as visited.</span><br><span class="line">Recursively visit all unmarked</span><br><span class="line">	vertices w adjacent to v.</span><br></pre></td></tr></table></figure>
+
+<p>主要应用：</p>
+<ul>
+<li>找到于给定顶点相连的所有顶点</li>
+<li>寻找两个顶点之间的路径</li>
+</ul>
+<p>将图的处理和图的对象<strong>解耦</strong></p>
+<p><img src="/2021/03/10/Graph-Undirected-Graphs/image-20210313094035708.png" alt="image-20210313094035708"></p>
+<h3 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h3><p>对于递归过程，使用以下两种数据结构</p>
+<ul>
+<li><p><code>boolean[] marked</code>标记已经到达的顶点；也作为递归结束的返回条件</p>
+</li>
+<li><p><code>int[] edgeTo</code>标记跟踪DFS生成树的边；作为最后的结果；</p>
+<p><code>edgeTo(w) == v</code> 表示<code>v-w</code>第一次被访问到；</p>
+<p>表示的是w是被v连接的，即，<strong>可以在完成DFS后，反向的对一个顶点进行追踪</strong></p>
+</li>
+</ul>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DepthFirstPaths</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span>[] marked;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span>[] edgeTo;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> s;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">DepthFirstPaths</span><span class="params">(Graph G, <span class="keyword">int</span> s)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="comment">// initialize the data structure;</span></span><br><span class="line">		<span class="comment">// ...</span></span><br><span class="line">		dfs(G, s);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dfs</span><span class="params">(Graph G, <span class="keyword">int</span> v)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		marked[v] = <span class="keyword">true</span>;			<span class="comment">// 标记当前顶点marked</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> w : G.adj(v))		<span class="comment">// 遍历全部w顶点的邻接表</span></span><br><span class="line">		&#123;							 	</span><br><span class="line">			<span class="keyword">if</span>(!marked[w])			<span class="comment">// 如果未标记</span></span><br><span class="line">			&#123;</span><br><span class="line">				dfs(G, w);</span><br><span class="line">				edgeTo[w] = v;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="性质"><a href="#性质" class="headerlink" title="性质"></a>性质</h3><ol>
+<li><p>DFS标记<strong>所有的与s相连的顶点</strong>所需时间，与<strong>顶点的度的和</strong>成正比</p>
+<p>简单证明：每个顶点只被访问到一次</p>
+</li>
+<li><p>DFS之后，能访问与s相连的顶点在常数时间，找到一条路径的时间与其长度成time propertional</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DFS标记了一个以s为根的树,进行查找使用的是Stack</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hasPathTo</span><span class="params">(<span class="keyword">int</span> v)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> marked[v];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Iterable&lt;Integer&gt; <span class="title">pathTo</span><span class="params">(<span class="keyword">int</span> v)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!hasPathTo(v))	<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    Stack&lt;Integer&gt; path = <span class="keyword">new</span> Stack&lt;Integer&gt;();</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> x = v; x != s; x = edgeTo[x])</span><br><span class="line">        path.push(x);</span><br><span class="line">    path.push(s);</span><br><span class="line">    <span class="keyword">return</span> path;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h2 id="BFS-Breadth-First-Search"><a href="#BFS-Breadth-First-Search" class="headerlink" title="BFS Breadth-First Search"></a>BFS Breadth-First Search</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Repeat until queue is empty:</span><br><span class="line">	Remove vertex v from queue</span><br><span class="line">	Add to queue all unmarked vertices adjancenet to v and mark them</span><br></pre></td></tr></table></figure>
+
+<p>对比DFS，使用的是两种数据结构对未访问到的节点进行存储；</p>
+<ul>
+<li>DFS使用<code>Stack</code>存储未访问到的顶点</li>
+<li>BFS使用<code>Queue</code>存储未访问到的顶点</li>
+</ul>
+<p>典型应用</p>
+<p>BFS能解决的主要问题是例如：</p>
+<p>最短路径问题：找到顶点s到t最短路径（最少的边）</p>
+<img src="/2021/03/10/Graph-Undirected-Graphs/image-20210313100241913.png" alt="image-20210313100241913" style="zoom: 67%;">
+
+<p>BFS：检查增加一个单位距离到起点s的所有顶点</p>
+<img src="/2021/03/10/Graph-Undirected-Graphs/image-20210313100508186.png" alt="image-20210313100508186" style="zoom:50%;">
+
+<h3 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BreadthFirstPaths</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span>[] marked;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span>[] edgeTo;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">bfs</span><span class="params">(Graph G, <span class="keyword">int</span> s)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		Queue&lt;Integer&gt; q = <span class="keyword">new</span> Queue&lt;Integer&gt;();</span><br><span class="line">		q.enqueue(s);</span><br><span class="line">		marked[s] = <span class="keyword">true</span>;</span><br><span class="line">		<span class="keyword">while</span>(!q.isEmpty())</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">int</span> v = q.dequeue();</span><br><span class="line">			<span class="keyword">for</span>(<span class="keyword">int</span> w : G.adj(v))</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">if</span>(!marked[w])</span><br><span class="line">				&#123;</span><br><span class="line">					q.enqueue(w);</span><br><span class="line">					marked[w] = <span class="keyword">true</span>;</span><br><span class="line">					edgeTo[w] = v;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Connected-Components"><a href="#Connected-Components" class="headerlink" title="Connected Components"></a>Connected Components</h2><p>连接性查询：如果顶点v和顶点w是相连的，则能够找到一条路径</p>
+<p>连通分量：指的是相连顶点的最大集合</p>
+<img src="/2021/03/10/Graph-Undirected-Graphs/image-20210313101221100.png" alt="image-20210313101221100" style="zoom:50%;">
+
+<ul>
+<li><p>第一章：<strong>Union-Find</strong>方法</p>
+</li>
+<li><p>DFS解法</p>
+<p>对于顶点v，使用DFS找到相连的分量</p>
+</li>
+</ul>
+<h3 id="代码实现-2"><a href="#代码实现-2" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CC</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span>[] marked;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span>[] id;			<span class="comment">// 标记连通分量的id</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> count;			<span class="comment">// 标记连通分量的数量</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">CC</span><span class="params">(Graph G)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		marked = <span class="keyword">new</span> <span class="keyword">boolean</span>[G.V()];</span><br><span class="line">		id = <span class="keyword">new</span> <span class="keyword">int</span>[G.V()];</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> v = <span class="number">0</span>; v &lt; G.V(); v++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (!marked[v])</span><br><span class="line">			&#123;</span><br><span class="line">				dfs(G, v);		<span class="comment">// 运行DFS</span></span><br><span class="line">				count++;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">count</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> count;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">id</span><span class="params">(<span class="keyword">int</span> v)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> id[v];</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">dfs</span><span class="params">(Graph G, <span class="keyword">int</span> v)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		marked[v] = <span class="keyword">true</span>;</span><br><span class="line">		id[v] = count;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> w : G.adj(v))</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span>(!marked[w])</span><br><span class="line">			&#123;</span><br><span class="line">				dfs(G, w);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/Searching-HashTables/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Wayneyu1.jpg">
+      <meta itemprop="name" content="Wayne Yu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WayneYu">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/10/Searching-HashTables/" class="post-title-link" itemprop="url">Searching-HashTables</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-03-10 09:32:11" itemprop="dateCreated datePublished" datetime="2021-03-10T09:32:11+08:00">2021-03-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-03-18 17:09:36" itemprop="dateModified" datetime="2021-03-18T17:09:36+08:00">2021-03-18</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E3%80%8A%E7%AE%97%E6%B3%954%E3%80%8B/" itemprop="url" rel="index"><span itemprop="name">《算法4》</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Hashing"><a href="#Hashing" class="headerlink" title="Hashing"></a>Hashing</h1><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>将元素以键值对的形式存在一个表中</p>
+<ul>
+<li><p>Hash Function 散列方法</p>
+<p>一个计算对应数组下标index的key的方法；是一种将字符组成的<strong>字符串</strong>转换为<strong>固定长度</strong>的数组或索引值的方法</p>
+</li>
+</ul>
+<h3 id="Java中的hash-code"><a href="#Java中的hash-code" class="headerlink" title="Java中的hash code"></a>Java中的hash code</h3><p>所有的java 类class继承一个<code>hashcode()</code>方法，返回32位int</p>
+<ul>
+<li>默认实现：对象的存储地址</li>
+<li>自定义实现：Integer，Double，String等封装类</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Integer</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line"> <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> value;</span><br><span class="line"> ...</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"> </span>&#123; <span class="keyword">return</span> value; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Double</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line"> <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">double</span> value;</span><br><span class="line"> ...</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"> </span>&#123;</span><br><span class="line"> <span class="keyword">long</span> bits = doubleToLongBits(value);</span><br><span class="line"> <span class="keyword">return</span> (<span class="keyword">int</span>) (bits ^ (bits &gt;&gt;&gt; <span class="number">32</span>));</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>String的实现</p>
+<ul>
+<li><p>Horner’s method：多项式计算</p>
+<p>$h = s[0] · 31^{L–1} + … + s[L – 3] · 31^2 + s[L – 2] · 31^1 + s[L – 1] · 31^0.$</p>
+</li>
+<li><p>性能提升</p>
+<p>缓存hash值在Java的实例变量中</p>
+<p>返回缓存的变量</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">String</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">char</span>[] s;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> hash;	<span class="comment">// 缓存的实例变量</span></span><br><span class="line"> ...</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"> 	</span>&#123;</span><br><span class="line">         <span class="keyword">int</span> h = hash;</span><br><span class="line">         <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; length(); i++)</span><br><span class="line">         hash = s[i] + (<span class="number">31</span> * hash);</span><br><span class="line">         <span class="keyword">return</span> hash;</span><br><span class="line"> 	&#125;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<h3 id="Hash-Code的设计"><a href="#Hash-Code的设计" class="headerlink" title="Hash Code的设计"></a>Hash Code的设计</h3><p>用户自定义方式：</p>
+<img src="/2021/03/10/Searching-HashTables/image-20210318160334318.png" alt="image-20210318160334318" style="zoom:67%;">
+
+<p>基本思想：以空间换取时间</p>
+<h3 id="Modular-hashing"><a href="#Modular-hashing" class="headerlink" title="Modular hashing"></a>Modular hashing</h3><p>模运算的hashing函数</p>
+<p>Hash code：$[-2^{31}, 2^{31}-1]$</p>
+<p>Hash Function: int between 0 and M-1 (对应数组的index)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 一种错误计算，负数没有取模运算</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Key key)</span></span></span><br><span class="line"><span class="function"></span>&#123; <span class="keyword">return</span> key.hashCode() % M; &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 正确计算</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Key key)</span></span></span><br><span class="line"><span class="function"></span>&#123; <span class="keyword">return</span> (key.hashCode() &amp; <span class="number">0x7fffffff</span>) % M; &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="均匀哈希"><a href="#均匀哈希" class="headerlink" title="均匀哈希"></a>均匀哈希</h3><p>每个key会均匀地，机会均等的散列到0 到M-1的整数中</p>
+<img src="/2021/03/10/Searching-HashTables/image-20210318161650871.png" alt="image-20210318161650871" style="zoom:67%;">
+
+<h2 id="separate-chaining-拉链法"><a href="#separate-chaining-拉链法" class="headerlink" title="separate chaining 拉链法"></a>separate chaining 拉链法</h2><p>哈希冲突：两个不同的key会被映射到相同的index上（值域一般小于定义域）；</p>
+<p>一般有两种方法解决哈希冲突：</p>
+<ul>
+<li>拉链法</li>
+<li>开放地址法<ul>
+<li>线性探针</li>
+</ul>
+</li>
+</ul>
+<h3 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h3><p>拉链法：使用一个大小为M的数组，M&lt;N，即需要映射的元素数量</p>
+<ul>
+<li>插入：将元素插入到第ith的链表上</li>
+<li>查找：只需查找第ith的链表即可</li>
+</ul>
+<img src="/2021/03/10/Searching-HashTables/image-20210318162051214.png" alt="image-20210318162051214" style="zoom:50%;">
+
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>以下代码固定得将M设置为97，可以动态的加倍或者减半</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SeparateChainingHashST</span>&lt;<span class="title">Key</span>, <span class="title">Value</span>&gt;</span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">     <span class="keyword">private</span> <span class="keyword">int</span> M = <span class="number">97</span>; 				<span class="comment">// number of chains</span></span><br><span class="line">     <span class="keyword">private</span> Node[] st = <span class="keyword">new</span> Node[M]; 	<span class="comment">// array of chains</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span></span></span><br><span class="line"><span class="class">    </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> Object key;</span><br><span class="line">        <span class="keyword">private</span> Object val;</span><br><span class="line">        <span class="keyword">private</span> Node next;</span><br><span class="line">     ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Key key)</span></span></span><br><span class="line"><span class="function">    </span>&#123; <span class="keyword">return</span> (key.hashCode() &amp; <span class="number">0x7fffffff</span>) % M; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Value <span class="title">get</span><span class="params">(Key key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> i = hash(key);</span><br><span class="line">        <span class="keyword">for</span> (Node x = st[i]; x != <span class="keyword">null</span>; x = x.next)</span><br><span class="line">        <span class="keyword">if</span> (key.equals(x.key)) <span class="keyword">return</span> (Value) x.val;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 单链表查询==for循环遍历链表即可</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(Key key, Value val)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> i = hash(key);</span><br><span class="line">        <span class="keyword">for</span> (Node x = st[i]; x != <span class="keyword">null</span>; x = x.next)</span><br><span class="line">        <span class="keyword">if</span> (key.equals(x.key)) &#123; x.val = val; <span class="keyword">return</span>; &#125;</span><br><span class="line">        st[i] = <span class="keyword">new</span> Node(key, val, st[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h3><p><img src="/2021/03/10/Searching-HashTables/image-20210318162459389.png" alt="image-20210318162459389"></p>
+<ul>
+<li>Typical choice: M ~ N / 5 ⇒ constant-time ops.</li>
+</ul>
+<h2 id="Open-addressing-开放地址法"><a href="#Open-addressing-开放地址法" class="headerlink" title="Open addressing 开放地址法"></a>Open addressing 开放地址法</h2><p>基本思想：当一个新key发生冲突时，找到下一个空的位置，将其插入（put at table index i if free; if not, try i+1, …）</p>
+<h3 id="linear-probing-线性探针法"><a href="#linear-probing-线性探针法" class="headerlink" title="linear probing 线性探针法"></a>linear probing 线性探针法</h3><p><strong>Hash</strong>. Map key to integer i between 0 and M-1. </p>
+<p><strong>Insert</strong>. Put at table index i if free; if not try i+1, i+2, etc. </p>
+<p><strong>Search</strong>. Search table index i; if occupied but no match, try i+1, i+2, etc.</p>
+<ul>
+<li>Array size <strong>M</strong> must be greater than number of key-value pairs <strong>N</strong>.</li>
+</ul>
+<img src="/2021/03/10/Searching-HashTables/image-20210318164833162.png" alt="image-20210318164833162" style="zoom:50%;">
+
+<h3 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LinearProbingHashST</span>&lt;<span class="title">Key</span>, <span class="title">Value</span>&gt;</span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> M = <span class="number">30001</span>;</span><br><span class="line">	<span class="keyword">private</span> Value[] vals = (Value[]) <span class="keyword">new</span> Object[M];</span><br><span class="line">	<span class="keyword">private</span> Key[] keys = (Key[]) <span class="keyword">new</span> Object[M];</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Key key)</span> </span>&#123;<span class="comment">/* as before*/</span>&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(Key key, Value val)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">int</span> i;</span><br><span class="line">		<span class="keyword">for</span>(i = hash(key);keys[i] != <span class="keyword">null</span>; i = (i+<span class="number">1</span>) % M)	<span class="comment">// 保证在哈希数组内，且循环使用？</span></span><br><span class="line">			<span class="keyword">if</span>(keys[i].equals(key))</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">		keys[i] = key;</span><br><span class="line">		vals[i] = val;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Value <span class="title">get</span><span class="params">(Key key)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i=hash(key); keys[i] != <span class="keyword">null</span>; i = (i+<span class="number">1</span>) % M)</span><br><span class="line">			<span class="keyword">if</span>(keys[i].equals(key))</span><br><span class="line">				<span class="keyword">return</span> vals[i];</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="性能分析-1"><a href="#性能分析-1" class="headerlink" title="性能分析"></a>性能分析</h3><p>Proposition. Under uniform hashing assumption, the average # of probes in a linear probing hash table of size M that contains N = α M keys is:</p>
+<img src="/2021/03/10/Searching-HashTables/image-20210318170652453.png" alt="image-20210318170652453" style="zoom:50%;">
+
+
+
+<ul>
+<li>Typical choice: α = N / M ~ ½.</li>
+</ul>
+<h2 id="ST-实现性能总结"><a href="#ST-实现性能总结" class="headerlink" title="ST 实现性能总结"></a>ST 实现性能总结</h2><p><img src="/2021/03/10/Searching-HashTables/image-20210318170734047.png" alt="image-20210318170734047"></p>
+<h3 id="HashTable-VS-BST"><a href="#HashTable-VS-BST" class="headerlink" title="HashTable VS BST"></a>HashTable VS BST</h3><p>In Java,</p>
+<ul>
+<li><strong>Red-black BSTs</strong>:<code> java.util.TreeMap</code>, <code>java.util.TreeSet</code>. </li>
+<li><strong>Hash tables:</strong> <code>java.util.HashMap</code>, <code>java.util.IdentityHashMap</code>.</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
     
 
 
@@ -339,190 +677,10 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/09/Nginx%E5%AE%B9%E5%99%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/Wayneyu1.jpg">
-      <meta itemprop="name" content="Wayne Yu">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="WayneYu">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/03/09/Nginx%E5%AE%B9%E5%99%A8/" class="post-title-link" itemprop="url">Nginx容器</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2021-03-09 16:04:44 / 修改时间：16:07:00" itemprop="dateCreated datePublished" datetime="2021-03-09T16:04:44+08:00">2021-03-09</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">网络开发</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h1><p>Nginx最大的作用，就是搭建一个Web Server。再加上容器，服务器就部署好了，然后根据不同的正则匹配规则，采取不同的转发策略；</p>
-<blockquote>
-<p>  <a target="_blank" rel="noopener" href="http://nginx.org/">官网连接</a></p>
-<p>  <a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903638570123277">浅谈Nginx服务器的内部核心架构设计</a></p>
-</blockquote>
-<p>也用做反向代理服务器</p>
-<p>反向代理：代理后端的服务器，客户端无感知，向反向代理服务器发起请求后，由反向代理服务器向服务器发起请求并捕获数据，返回给客户端。代理服务器和目标服务器对外是同一服务器，暴露代理服务器而隐藏真实目标服务器；</p>
-<p>正向代理：代理客户端，如VPN，更换客户端的网络入口；</p>
-<p><img src="/2021/03/09/Nginx%E5%AE%B9%E5%99%A8/image-20210309150542385.png" alt="image-20210309150542385"></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/03/09/Nginx%E5%AE%B9%E5%99%A8/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/28/Searching-Balanced%20Search%20Trees/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/Wayneyu1.jpg">
-      <meta itemprop="name" content="Wayne Yu">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="WayneYu">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/02/28/Searching-Balanced%20Search%20Trees/" class="post-title-link" itemprop="url">Searching-Balanced Search Trees</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-02-28 21:15:40" itemprop="dateCreated datePublished" datetime="2021-02-28T21:15:40+08:00">2021-02-28</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-03-03 10:21:15" itemprop="dateModified" datetime="2021-03-03T10:21:15+08:00">2021-03-03</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E3%80%8A%E7%AE%97%E6%B3%954%E3%80%8B/" itemprop="url" rel="index"><span itemprop="name">《算法4》</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>寻找保证对于搜索，插入，以及删除等基本数据结构操作的对数性能的开销；</p>
-<p>本节将继续学习用于search的树形结构，2-3 Search Trees的基本概念，但对于23树的实现太过于复杂，不对其进行代码级别的实现；</p>
-<p>以23树原理为基础，我们可以进一步抽象出最为经典的红黑树结构 ，拥有最为稳定的性能以及较为简单的实现；</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/02/28/Searching-Balanced%20Search%20Trees/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 

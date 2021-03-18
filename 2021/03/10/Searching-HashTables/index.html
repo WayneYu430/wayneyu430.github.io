@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"8.0.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="Hashing基本概念将元素以键值对的形式存在一个表中  Hash Function 散列方法 一个计算对应数组下标index的key的方法；是一种将字符组成的字符串转换为固定长度的数组或索引值的方法   Java中的hash code所有的java 类class继承一个hashcode()方法，返回32位int  默认实现：对象的存储地址 自定义实现：Integer，Double，String等">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Searching-HashTables">
+<meta property="og:url" content="http://example.com/2021/03/10/Searching-HashTables/index.html">
+<meta property="og:site_name" content="WayneYu">
+<meta property="og:description" content="Hashing基本概念将元素以键值对的形式存在一个表中  Hash Function 散列方法 一个计算对应数组下标index的key的方法；是一种将字符组成的字符串转换为固定长度的数组或索引值的方法   Java中的hash code所有的java 类class继承一个hashcode()方法，返回32位int  默认实现：对象的存储地址 自定义实现：Integer，Double，String等">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2021/03/10/Searching-HashTables/image-20210318160334318.png">
+<meta property="og:image" content="http://example.com/2021/03/10/Searching-HashTables/image-20210318161650871.png">
+<meta property="og:image" content="http://example.com/2021/03/10/Searching-HashTables/image-20210318162051214.png">
+<meta property="og:image" content="http://example.com/2021/03/10/Searching-HashTables/image-20210318162459389.png">
+<meta property="og:image" content="http://example.com/2021/03/10/Searching-HashTables/image-20210318164833162.png">
+<meta property="og:image" content="http://example.com/2021/03/10/Searching-HashTables/image-20210318170652453.png">
+<meta property="og:image" content="http://example.com/2021/03/10/Searching-HashTables/image-20210318170734047.png">
+<meta property="article:published_time" content="2021-03-10T01:32:11.000Z">
+<meta property="article:modified_time" content="2021-03-18T09:09:36.487Z">
+<meta property="article:author" content="Wayne Yu">
+<meta property="article:tag" content="Algorithms-4">
+<meta property="article:tag" content="Searching">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/03/10/Searching-HashTables/image-20210318160334318.png">
+
+
+<link rel="canonical" href="http://example.com/2021/03/10/Searching-HashTables/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Searching-HashTables | WayneYu</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">WayneYu</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section">首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags" rel="section">标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories" rel="section">分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives" rel="section">归档</a>
+
+  </li>
+        <li class="menu-item menu-item-schedule">
+
+    <a href="/schedule" rel="section">日程表</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Hashing"><span class="nav-number">1.</span> <span class="nav-text">Hashing</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.0.1.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java%E4%B8%AD%E7%9A%84hash-code"><span class="nav-number">1.0.2.</span> <span class="nav-text">Java中的hash code</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hash-Code%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.0.3.</span> <span class="nav-text">Hash Code的设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Modular-hashing"><span class="nav-number">1.0.4.</span> <span class="nav-text">Modular hashing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%87%E5%8C%80%E5%93%88%E5%B8%8C"><span class="nav-number">1.0.5.</span> <span class="nav-text">均匀哈希</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#separate-chaining-%E6%8B%89%E9%93%BE%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">separate chaining 拉链法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">1.1.1.</span> <span class="nav-text">基本思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.1.2.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-number">1.1.3.</span> <span class="nav-text">性能分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Open-addressing-%E5%BC%80%E6%94%BE%E5%9C%B0%E5%9D%80%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">Open addressing 开放地址法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#linear-probing-%E7%BA%BF%E6%80%A7%E6%8E%A2%E9%92%88%E6%B3%95"><span class="nav-number">1.2.1.</span> <span class="nav-text">linear probing 线性探针法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90-1"><span class="nav-number">1.2.3.</span> <span class="nav-text">性能分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ST-%E5%AE%9E%E7%8E%B0%E6%80%A7%E8%83%BD%E6%80%BB%E7%BB%93"><span class="nav-number">1.3.</span> <span class="nav-text">ST 实现性能总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HashTable-VS-BST"><span class="nav-number">1.3.1.</span> <span class="nav-text">HashTable VS BST</span></a></li></ol></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wayne Yu"
+      src="/uploads/Wayneyu1.jpg">
+  <p class="site-author-name" itemprop="name">Wayne Yu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/WayneYu430" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;WayneYu430" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wayneyu30@163.com" title="E-Mail → mailto:wayneyu30@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/Searching-HashTables/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/Wayneyu1.jpg">
+      <meta itemprop="name" content="Wayne Yu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WayneYu">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Searching-HashTables
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-03-10 09:32:11" itemprop="dateCreated datePublished" datetime="2021-03-10T09:32:11+08:00">2021-03-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-03-18 17:09:36" itemprop="dateModified" datetime="2021-03-18T17:09:36+08:00">2021-03-18</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E3%80%8A%E7%AE%97%E6%B3%954%E3%80%8B/" itemprop="url" rel="index"><span itemprop="name">《算法4》</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Hashing"><a href="#Hashing" class="headerlink" title="Hashing"></a>Hashing</h1><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>将元素以键值对的形式存在一个表中</p>
+<ul>
+<li><p>Hash Function 散列方法</p>
+<p>一个计算对应数组下标index的key的方法；是一种将字符组成的<strong>字符串</strong>转换为<strong>固定长度</strong>的数组或索引值的方法</p>
+</li>
+</ul>
+<h3 id="Java中的hash-code"><a href="#Java中的hash-code" class="headerlink" title="Java中的hash code"></a>Java中的hash code</h3><p>所有的java 类class继承一个<code>hashcode()</code>方法，返回32位int</p>
+<ul>
+<li>默认实现：对象的存储地址</li>
+<li>自定义实现：Integer，Double，String等封装类</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Integer</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line"> <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> value;</span><br><span class="line"> ...</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"> </span>&#123; <span class="keyword">return</span> value; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Double</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line"> <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">double</span> value;</span><br><span class="line"> ...</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"> </span>&#123;</span><br><span class="line"> <span class="keyword">long</span> bits = doubleToLongBits(value);</span><br><span class="line"> <span class="keyword">return</span> (<span class="keyword">int</span>) (bits ^ (bits &gt;&gt;&gt; <span class="number">32</span>));</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>String的实现</p>
+<ul>
+<li><p>Horner’s method：多项式计算</p>
+<p>$h = s[0] · 31^{L–1} + … + s[L – 3] · 31^2 + s[L – 2] · 31^1 + s[L – 1] · 31^0.$</p>
+</li>
+<li><p>性能提升</p>
+<p>缓存hash值在Java的实例变量中</p>
+<p>返回缓存的变量</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">String</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">char</span>[] s;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> hash;	<span class="comment">// 缓存的实例变量</span></span><br><span class="line"> ...</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"> 	</span>&#123;</span><br><span class="line">         <span class="keyword">int</span> h = hash;</span><br><span class="line">         <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; length(); i++)</span><br><span class="line">         hash = s[i] + (<span class="number">31</span> * hash);</span><br><span class="line">         <span class="keyword">return</span> hash;</span><br><span class="line"> 	&#125;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<h3 id="Hash-Code的设计"><a href="#Hash-Code的设计" class="headerlink" title="Hash Code的设计"></a>Hash Code的设计</h3><p>用户自定义方式：</p>
+<img src="/2021/03/10/Searching-HashTables/image-20210318160334318.png" alt="image-20210318160334318" style="zoom:67%;">
+
+<p>基本思想：以空间换取时间</p>
+<h3 id="Modular-hashing"><a href="#Modular-hashing" class="headerlink" title="Modular hashing"></a>Modular hashing</h3><p>模运算的hashing函数</p>
+<p>Hash code：$[-2^{31}, 2^{31}-1]$</p>
+<p>Hash Function: int between 0 and M-1 (对应数组的index)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 一种错误计算，负数没有取模运算</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Key key)</span></span></span><br><span class="line"><span class="function"></span>&#123; <span class="keyword">return</span> key.hashCode() % M; &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 正确计算</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Key key)</span></span></span><br><span class="line"><span class="function"></span>&#123; <span class="keyword">return</span> (key.hashCode() &amp; <span class="number">0x7fffffff</span>) % M; &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="均匀哈希"><a href="#均匀哈希" class="headerlink" title="均匀哈希"></a>均匀哈希</h3><p>每个key会均匀地，机会均等的散列到0 到M-1的整数中</p>
+<img src="/2021/03/10/Searching-HashTables/image-20210318161650871.png" alt="image-20210318161650871" style="zoom:67%;">
+
+<h2 id="separate-chaining-拉链法"><a href="#separate-chaining-拉链法" class="headerlink" title="separate chaining 拉链法"></a>separate chaining 拉链法</h2><p>哈希冲突：两个不同的key会被映射到相同的index上（值域一般小于定义域）；</p>
+<p>一般有两种方法解决哈希冲突：</p>
+<ul>
+<li>拉链法</li>
+<li>开放地址法<ul>
+<li>线性探针</li>
+</ul>
+</li>
+</ul>
+<h3 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h3><p>拉链法：使用一个大小为M的数组，M&lt;N，即需要映射的元素数量</p>
+<ul>
+<li>插入：将元素插入到第ith的链表上</li>
+<li>查找：只需查找第ith的链表即可</li>
+</ul>
+<img src="/2021/03/10/Searching-HashTables/image-20210318162051214.png" alt="image-20210318162051214" style="zoom:50%;">
+
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>以下代码固定得将M设置为97，可以动态的加倍或者减半</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SeparateChainingHashST</span>&lt;<span class="title">Key</span>, <span class="title">Value</span>&gt;</span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">     <span class="keyword">private</span> <span class="keyword">int</span> M = <span class="number">97</span>; 				<span class="comment">// number of chains</span></span><br><span class="line">     <span class="keyword">private</span> Node[] st = <span class="keyword">new</span> Node[M]; 	<span class="comment">// array of chains</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span></span></span><br><span class="line"><span class="class">    </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> Object key;</span><br><span class="line">        <span class="keyword">private</span> Object val;</span><br><span class="line">        <span class="keyword">private</span> Node next;</span><br><span class="line">     ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Key key)</span></span></span><br><span class="line"><span class="function">    </span>&#123; <span class="keyword">return</span> (key.hashCode() &amp; <span class="number">0x7fffffff</span>) % M; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Value <span class="title">get</span><span class="params">(Key key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> i = hash(key);</span><br><span class="line">        <span class="keyword">for</span> (Node x = st[i]; x != <span class="keyword">null</span>; x = x.next)</span><br><span class="line">        <span class="keyword">if</span> (key.equals(x.key)) <span class="keyword">return</span> (Value) x.val;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 单链表查询==for循环遍历链表即可</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(Key key, Value val)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> i = hash(key);</span><br><span class="line">        <span class="keyword">for</span> (Node x = st[i]; x != <span class="keyword">null</span>; x = x.next)</span><br><span class="line">        <span class="keyword">if</span> (key.equals(x.key)) &#123; x.val = val; <span class="keyword">return</span>; &#125;</span><br><span class="line">        st[i] = <span class="keyword">new</span> Node(key, val, st[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h3><p><img src="/2021/03/10/Searching-HashTables/image-20210318162459389.png" alt="image-20210318162459389"></p>
+<ul>
+<li>Typical choice: M ~ N / 5 ⇒ constant-time ops.</li>
+</ul>
+<h2 id="Open-addressing-开放地址法"><a href="#Open-addressing-开放地址法" class="headerlink" title="Open addressing 开放地址法"></a>Open addressing 开放地址法</h2><p>基本思想：当一个新key发生冲突时，找到下一个空的位置，将其插入（put at table index i if free; if not, try i+1, …）</p>
+<h3 id="linear-probing-线性探针法"><a href="#linear-probing-线性探针法" class="headerlink" title="linear probing 线性探针法"></a>linear probing 线性探针法</h3><p><strong>Hash</strong>. Map key to integer i between 0 and M-1. </p>
+<p><strong>Insert</strong>. Put at table index i if free; if not try i+1, i+2, etc. </p>
+<p><strong>Search</strong>. Search table index i; if occupied but no match, try i+1, i+2, etc.</p>
+<ul>
+<li>Array size <strong>M</strong> must be greater than number of key-value pairs <strong>N</strong>.</li>
+</ul>
+<img src="/2021/03/10/Searching-HashTables/image-20210318164833162.png" alt="image-20210318164833162" style="zoom:50%;">
+
+<h3 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LinearProbingHashST</span>&lt;<span class="title">Key</span>, <span class="title">Value</span>&gt;</span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> M = <span class="number">30001</span>;</span><br><span class="line">	<span class="keyword">private</span> Value[] vals = (Value[]) <span class="keyword">new</span> Object[M];</span><br><span class="line">	<span class="keyword">private</span> Key[] keys = (Key[]) <span class="keyword">new</span> Object[M];</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Key key)</span> </span>&#123;<span class="comment">/* as before*/</span>&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(Key key, Value val)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">int</span> i;</span><br><span class="line">		<span class="keyword">for</span>(i = hash(key);keys[i] != <span class="keyword">null</span>; i = (i+<span class="number">1</span>) % M)	<span class="comment">// 保证在哈希数组内，且循环使用？</span></span><br><span class="line">			<span class="keyword">if</span>(keys[i].equals(key))</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">		keys[i] = key;</span><br><span class="line">		vals[i] = val;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Value <span class="title">get</span><span class="params">(Key key)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i=hash(key); keys[i] != <span class="keyword">null</span>; i = (i+<span class="number">1</span>) % M)</span><br><span class="line">			<span class="keyword">if</span>(keys[i].equals(key))</span><br><span class="line">				<span class="keyword">return</span> vals[i];</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="性能分析-1"><a href="#性能分析-1" class="headerlink" title="性能分析"></a>性能分析</h3><p>Proposition. Under uniform hashing assumption, the average # of probes in a linear probing hash table of size M that contains N = α M keys is:</p>
+<img src="/2021/03/10/Searching-HashTables/image-20210318170652453.png" alt="image-20210318170652453" style="zoom:50%;">
+
+
+
+<ul>
+<li>Typical choice: α = N / M ~ ½.</li>
+</ul>
+<h2 id="ST-实现性能总结"><a href="#ST-实现性能总结" class="headerlink" title="ST 实现性能总结"></a>ST 实现性能总结</h2><p><img src="/2021/03/10/Searching-HashTables/image-20210318170734047.png" alt="image-20210318170734047"></p>
+<h3 id="HashTable-VS-BST"><a href="#HashTable-VS-BST" class="headerlink" title="HashTable VS BST"></a>HashTable VS BST</h3><p>In Java,</p>
+<ul>
+<li><strong>Red-black BSTs</strong>:<code> java.util.TreeMap</code>, <code>java.util.TreeSet</code>. </li>
+<li><strong>Hash tables:</strong> <code>java.util.HashMap</code>, <code>java.util.IdentityHashMap</code>.</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Algorithms-4/" rel="tag"># Algorithms-4</a>
+              <a href="/tags/Searching/" rel="tag"># Searching</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/03/09/Docker%E5%85%A5%E9%97%A8/" rel="prev" title="Docker入门">
+                  <i class="fa fa-chevron-left"></i> Docker入门
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/03/10/Graph-Undirected-Graphs/" rel="next" title="Graph-Undirected Graphs">
+                  Graph-Undirected Graphs <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne Yu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+      <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = '//cdn.jsdelivr.net/npm/mathjax@3.1.0/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
